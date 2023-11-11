@@ -1,0 +1,4 @@
+ligne 1 je suis content\n
+ligne 2 la vie est belle\n
+ligne 3 \n
+\n
