@@ -1,91 +1,127 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: estegana <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/09 14:14:30 by estegana          #+#    #+#             */
-/*   Updated: 2023/11/09 14:14:32 by estegana         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "get_next_line.h"
 
-//#include "get_next_line.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+//ajouter une chaine de caractere a dst
+char	*ft_strjoin(char *dst, char *src)
+{
+	int	i;
+	int	j;
+	int	k;
+	char	*new;
 
-// LA FONCTION
+	i = 0;
+	j = 0;
+	k = 0;
+	if (!src)
+		return (dst);
+	new = malloc(sizeof(char) * (ft_strlen(dst) + ft_strlen(src) + 1));
+	if (!new)
+		return (NULL);
+	while (dst && dst[j])
+		new[i++] = dst[j++];
+	while (src[k])
+		new[i++] = src[k++];
+	new[i] = '\0';
+	return (new);
+}
+
+//verifier s'il y a un \n. 1 si oui, sinon 0
+int	newline(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] && str[i] != '\n')
+		i++;
+	if (str[i] == '\n')
+		return (1);
+	return (0);
+
+}
+//ecrire tout ce qu'il y a avant le \n
+char	*ft_linepure(char *stash)
+{
+	int	i;
+	char	*new;
+
+	i = 0;
+	new = malloc(sizeof(char) * i_newline(stash) + 1);
+	while (stash[i] && stash[i] != '\n')
+	{
+		new[i] = stash[i];
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}
+//nettoyer avant le \n et garder ce qu'il y a apres
+char	*ft_cleanstash(char	*stash)
+{
+	char	*cleaned;
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (stash[i] && stash[i] != '\n')
+		i++;
+	if (stash[i] == '\n')
+	{
+		i++;
+		while (stash[i])
+			cleaned[j++] = stash[i++];
+	}
+	return (cleaned);
+}
+//fonction principale
 //char	*get_next_line(int fd)
 //{
 //	char	*line;
-//	int	i;
+//	static char	*stash;
+//	char	*buf;
 
-//	i = 0;
-//	line[i] == read(1, buf, BUFFER_SIZE);
+//	stash = NULL;
+//	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+//	//0. proteger en cas bizarre
+//	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
+//		return (NULL);
+//	line = NULL;
+//	//1. lire fd et mettre ds une chn de char
+//	while (read(fd, buf, BUFFER_SIZE) > 0 && newline(stash) != 1)
+//	{
+//		ft_strcat(stash, buf);
+//		if (newline(stash) == 1)
+//			line = ft_linepure(stash);
+//	}
+//	//3. nettoyer stash
+//	ft_cleanstash(stash);
 //	return (line);
 //}
 
-int	main(void)
+char	*get_next_line(int fd)
 {
-	char	buf[100];	// stocke les caractères lus par read
-	int	fd;		// descripteur de fichier à lire
-	int	nb_read;	// stocke le retour de read
-	int	count;		// compte du nombre de lectures avec read
+	int readbytes;
+	static char *stash;
+	char *line;
+	char *buf;
+	//char *temp;
 
-//	Ouvre le fichier cat.txt en mode lecture seule
-	fd = open("file_test.txt", O_RDONLY);
-	if (fd == -1)
-		return (1);
-//	Initialise les variables de compte
-	nb_read = -1;
-	count = 0;
-//	Boucle tant que read ne retourne pas 0 (ce qui veut dire
-//	qu'il n'y a plus rien à lire dans le fichier)
-	while (nb_read != 0)
+	line = NULL;
+	stash = NULL;
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	readbytes = read(fd, buf, BUFFER_SIZE);
+	//proteger les cas exceptionnels
+	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
+		return (NULL);
+	//tant que read (=curseur de lecture) lit qqch
+	while (readbytes > 0)
 	{
-		// Lecture de 100 caractères avec read depuis le
-		// descripteur de fichier ouvert
-		nb_read = read(fd, buf, 100);
-		// En cas d'erreur, read renvoie -1, on arrête tout
-		if (nb_read == -1)
-		{
-			printf("Erreur de lecture !\n");
-			return (1);
-		}
-		// Read n'ajoute pas le \0 à la fin de la chaîne
-		// de caractères lus. On peut se servir du nombre
-		// de caractères lus comme index du dernier caractère
-		buf[nb_read] = '\0';
-		// Imprime ce que contient le buffer après la lecture
-		printf("\e[36m%d : [\e[0m%s\e[36m]\e[0m\n", count, buf);
-		count++;
+		buf[readbytes] = '\0';
+		stash = ft_strjoin(stash, buf);
+		if (newline(buf))
+			break;
+		readbytes = read(fd, buf, BUFFER_SIZE);
 	}
-//	Ferme le descripteur de fichier ouvert plus tôt
-	close(fd);
-	return (0);
+	line = ft_linepure(stash);
+	return (line);
 }
-//// NOS TESTS
-//int	main(int ac, char **av)
-//{
-//	char	*line;
-//	int		fd;
-//	int		i;
 
-//	if (ac == 2)
-//		fd = open(av[1]);
-//	else
-//		fd = open("file_test.txt");
-//	i = 0;
-//	line = get_next_line(fd);
-//	while (line)
-//	{
-//		printf("ma ligne %d: %s", i, line);
-//		free(line);
-//		line = get_next_line(fd);
-//		i++;
-//	}
-//	return (0);
-//}
