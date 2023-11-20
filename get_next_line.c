@@ -12,23 +12,11 @@
 
 #include "get_next_line.h"
 
-//voir si y a un \n
-int	newline(char *str)
+// ecrire tout ce qu'il y a avant le \n
+char *ft_linepure(char *stash)
 {
-	int	i;
-
-	i = 0;
-	while (str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\n')
-		return (1);
-	return (0);
-}
-//ecrire tout ce qu'il y a avant le \n
-char	*ft_linepure(char *stash)
-{
-	int			i;
-	char		*new;
+	int i;
+	char *new;
 
 	i = 0;
 	new = malloc(sizeof(char) * (i_newline(stash) + 1));
@@ -42,12 +30,12 @@ char	*ft_linepure(char *stash)
 	return (new);
 }
 
-//nettoyer avant le \n et garder ce qu'il y a apres
-char	*ft_cleanstash(char	*stash)
+// nettoyer avant le \n et garder ce qu'il y a apres
+char *ft_cleanstash(char *stash)
 {
-	char	*cleaned;
-	int		i;
-	int		j;
+	char *cleaned;
+	int i;
+	int j;
 
 	i = 0;
 	j = 0;
@@ -65,46 +53,45 @@ char	*ft_cleanstash(char	*stash)
 	return (cleaned);
 }
 
-char	*get_next_line(int fd)
+char *get_next_line(int fd)
 {
-	static char	*stash;
-	char		*line;
-	char		*buf;
-	int			readbytes;
+	static char *stash = NULL;
+	char *line;
+	char *buf;
+	int readbytes = 0;
 
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	readbytes = read(fd, buf, BUFFER_SIZE);
 	if (!buf)
 		return (NULL);
-	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0 || readbytes < 0)
 		return (NULL);
-	readbytes = read(fd, buf, BUFFER_SIZE);
+	//premiere boucle
 	if (stash == NULL)
+		stash = ft_strdup(buf);
+	printf("premiere init %s", buf);
+	//autre + premiere boucle
+	while (buf)
 	{
-		while (readbytes > 0)
+		if (newline(stash))
+			break ;
+		else
 		{
-			buf[readbytes] = '\0';
-			stash = ft_strdup(buf);
-			if (newline(stash))
-				break ;
-		}
-	}
-	else
-	{
-		while (readbytes > 0)
-		{
-			buf[readbytes] = '\0';
 			stash = ft_strjoin(stash, buf);
-			if (newline(stash))
-				break ;
+			printf("join %s", stash);
 		}
+
 	}
+	//isoler tt cquil y a avant \n
 	line = ft_linepure(stash);
+	printf("line :::: %s", line);
+	//nettoyer avant \n laisser le reste
 	stash = ft_cleanstash(stash);
+	printf("stash ::::%s", stash);
 	free(buf);
 	if (!stash)
 		return (free(line), NULL);
 	if (!line)
 		return (free(stash), NULL);
-	//printf("stash restante : %s\n", stash);
 	return (line);
 }

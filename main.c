@@ -11,25 +11,25 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 
-int	main(int ac, char **av)
+int main(int ac, char **av)
 {
-	int		fd;
-	char	*line;
+	int fd;
+	char *line;
+	(void)ac;
+	(void)av;
 
-	if (ac > 1)
-		fd = open(av[0], O_RDONLY);
-	else
-		fd = open("file_test.txt", O_RDONLY);
+	fd = open("file_test.txt", O_RDONLY);
 	while (1)
 	{
 		line = get_next_line(fd);
 		if (line == NULL)
-			break ;
-		printf("%s", line);
+			break;
+		printf("la ligne a retourner: %s", line);
 		free(line);
-		break ;
+		close(fd);
+		//break ;
 	}
-	close(fd);
 	return (0);
 }

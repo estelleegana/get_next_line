@@ -73,3 +73,15 @@ char	*ft_strjoin(char *dst, char *src)
 	new[i] = '\0';
 	return (new);
 }
+// voir si y a un \n
+int newline(char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i] && str[i] != '\n')
+		i++;
+	if (str[i] == '\n')
+		return (1);
+	return (0);
+}
