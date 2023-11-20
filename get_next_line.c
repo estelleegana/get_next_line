@@ -1,30 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: estegana <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/20 11:50:18 by estegana          #+#    #+#             */
+/*   Updated: 2023/11/20 11:50:20 by estegana         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-//ajouter une chaine de caractere a dst
-char	*ft_strjoin(char *dst, char *src)
-{
-	int	i;
-	int	j;
-	int	k;
-	char	*new;
-
-	i = 0;
-	j = 0;
-	k = 0;
-	if (!src)
-		return (dst);
-	new = malloc(sizeof(char) * (ft_strlen(dst) + ft_strlen(src) + 1));
-	if (!new)
-		return (NULL);
-	while (dst && dst[j])
-		new[i++] = dst[j++];
-	while (src[k])
-		new[i++] = src[k++];
-	new[i] = '\0';
-	return (new);
-}
-
-//verifier s'il y a un \n. 1 si oui, sinon 0
+//voir si y a un \n
 int	newline(char *str)
 {
 	int	i;
@@ -35,33 +23,37 @@ int	newline(char *str)
 	if (str[i] == '\n')
 		return (1);
 	return (0);
-
 }
 //ecrire tout ce qu'il y a avant le \n
 char	*ft_linepure(char *stash)
 {
-	int	i;
-	char	*new;
+	int			i;
+	char		*new;
 
 	i = 0;
-	new = malloc(sizeof(char) * i_newline(stash) + 1);
+	new = malloc(sizeof(char) * (i_newline(stash) + 1));
 	while (stash[i] && stash[i] != '\n')
 	{
 		new[i] = stash[i];
 		i++;
 	}
+	new[i++] = '\n';
 	new[i] = '\0';
 	return (new);
 }
+
 //nettoyer avant le \n et garder ce qu'il y a apres
 char	*ft_cleanstash(char	*stash)
 {
 	char	*cleaned;
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 
 	i = 0;
 	j = 0;
+	cleaned = malloc(sizeof(char) * (ft_strlen(stash) - i_newline(stash) + 1));
+	if (!cleaned)
+		return (NULL);
 	while (stash[i] && stash[i] != '\n')
 		i++;
 	if (stash[i] == '\n')
@@ -72,56 +64,47 @@ char	*ft_cleanstash(char	*stash)
 	}
 	return (cleaned);
 }
-//fonction principale
-//char	*get_next_line(int fd)
-//{
-//	char	*line;
-//	static char	*stash;
-//	char	*buf;
-
-//	stash = NULL;
-//	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-//	//0. proteger en cas bizarre
-//	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
-//		return (NULL);
-//	line = NULL;
-//	//1. lire fd et mettre ds une chn de char
-//	while (read(fd, buf, BUFFER_SIZE) > 0 && newline(stash) != 1)
-//	{
-//		ft_strcat(stash, buf);
-//		if (newline(stash) == 1)
-//			line = ft_linepure(stash);
-//	}
-//	//3. nettoyer stash
-//	ft_cleanstash(stash);
-//	return (line);
-//}
 
 char	*get_next_line(int fd)
 {
-	int readbytes;
-	static char *stash;
-	char *line;
-	char *buf;
-	//char *temp;
+	static char	*stash;
+	char		*line;
+	char		*buf;
+	int			readbytes;
 
-	line = NULL;
-	stash = NULL;
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	readbytes = read(fd, buf, BUFFER_SIZE);
-	//proteger les cas exceptionnels
+	if (!buf)
+		return (NULL);
 	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	//tant que read (=curseur de lecture) lit qqch
-	while (readbytes > 0)
+	readbytes = read(fd, buf, BUFFER_SIZE);
+	if (stash == NULL)
 	{
-		buf[readbytes] = '\0';
-		stash = ft_strjoin(stash, buf);
-		if (newline(buf))
-			break;
-		readbytes = read(fd, buf, BUFFER_SIZE);
+		while (readbytes > 0)
+		{
+			buf[readbytes] = '\0';
+			stash = ft_strdup(buf);
+			if (newline(stash))
+				break ;
+		}
+	}
+	else
+	{
+		while (readbytes > 0)
+		{
+			buf[readbytes] = '\0';
+			stash = ft_strjoin(stash, buf);
+			if (newline(stash))
+				break ;
+		}
 	}
 	line = ft_linepure(stash);
+	stash = ft_cleanstash(stash);
+	free(buf);
+	if (!stash)
+		return (free(line), NULL);
+	if (!line)
+		return (free(stash), NULL);
+	//printf("stash restante : %s\n", stash);
 	return (line);
 }
-

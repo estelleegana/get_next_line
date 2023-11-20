@@ -35,3 +35,41 @@ int	i_newline(char *str)
 		return (i);
 	return (0);
 }
+
+char	*ft_strdup(char *str)
+{
+	int		i;
+	char	*dup;
+
+	i = 0;
+	dup = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	if (!dup)
+		return (NULL);
+	while (str[i])
+	{
+		dup[i] = str[i];
+		i++;
+	}
+	return (dup);
+}
+
+char	*ft_strjoin(char *dst, char *src)
+{
+	int		i;
+	int		j;
+	int		k;
+	char	*new;
+
+	i = 0;
+	j = 0;
+	k = 0;
+	new = malloc(sizeof(char) * (ft_strlen(dst) + ft_strlen(src) + 1));
+	if (!new)
+		return (NULL);
+	while (dst && dst[j])
+		new[i++] = dst[j++];
+	while (src[k])
+		new[i++] = src[k++];
+	new[i] = '\0';
+	return (new);
+}

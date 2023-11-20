@@ -5,13 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: estegana <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/09 14:14:37 by estegana          #+#    #+#             */
-/*   Updated: 2023/11/09 14:14:38 by estegana         ###   ########.fr       */
+/*   Created: 2023/11/20 11:54:16 by estegana          #+#    #+#             */
+/*   Updated: 2023/11/20 11:54:17 by estegana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GNL_H
-# define GNL_H
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 5
@@ -24,15 +24,14 @@
 # include <fcntl.h>
 
 //gnl
-char	*ft_strcat(char *dst, char *src);
-int	newline(char *str);
-char	*get_next_line(int fd);
+int		newline(char *str);
 char	*ft_linepure(char *stash);
 char	*ft_cleanstash(char	*stash);
 char	*get_next_line(int fd);
 //gnl_u
-int	ft_strlen(char *str);
-int	i_newline(char *str);
+int		ft_strlen(char *str);
+int		i_newline(char *str);
+char	*ft_strdup(char *str);
+char	*ft_strjoin(char *dst, char *src);
 
 #endif
-

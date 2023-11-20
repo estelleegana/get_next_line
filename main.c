@@ -1,30 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: estegana <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/20 11:49:03 by estegana          #+#    #+#             */
+/*   Updated: 2023/11/20 11:49:05 by estegana         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 int	main(int ac, char **av)
 {
-	int	fd;
+	int		fd;
 	char	*line;
 
-	fd = open("file_test.txt", O_RDONLY);
+	if (ac > 1)
+		fd = open(av[0], O_RDONLY);
+	else
+		fd = open("file_test.txt", O_RDONLY);
 	while (1)
 	{
 		line = get_next_line(fd);
-		//if (line == NULL)
-		//	break;
+		if (line == NULL)
+			break ;
 		printf("%s", line);
 		free(line);
-		break;
+		break ;
 	}
+	close(fd);
 	return (0);
 }
-
-//int main()
-//{
-//	int fd;
-//	char *buf;
-
-//	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-//	fd = open("file_test.txt", O_RDONLY);
-//	read(fd, buf, BUFFER_SIZE);
-//	printf("%s", buf);
-//}
