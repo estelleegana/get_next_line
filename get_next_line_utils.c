@@ -16,72 +16,38 @@ int	ft_strlen(char *str)
 {
 	int	i;
 
-	i = 0;
 	if (!str)
-		return (-1);
+		return (0);
+	i = 0;
 	while (str[i])
 		i++;
 	return (i);
 }
 
-int	i_newline(char *str)
+void	ft_bzero(char *buf)
 {
 	int	i;
 
 	i = 0;
-	while (str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\n')
-		return (i);
-	return (0);
+	if (buf)
+	{
+		while (buf[i])
+			buf[i++] = '\0';
+	}
 }
 
-char	*ft_strdup(char *str)
+int	i_nl(char *line)
 {
-	int		i;
-	char	*dup;
+	int	i;
 
 	i = 0;
-	dup = malloc(sizeof(char) * (ft_strlen(str) + 1));
-	if (!dup)
-		return (NULL);
-	while (str[i])
+	if (!line)
+		return (-1);
+	while (line[i])
 	{
-		dup[i] = str[i];
+		if (line[i] == '\n')
+			return (i);
 		i++;
 	}
-	return (dup);
-}
-
-char	*ft_strjoin(char *dst, char *src)
-{
-	int		i;
-	int		j;
-	int		k;
-	char	*new;
-
-	i = 0;
-	j = 0;
-	k = 0;
-	new = malloc(sizeof(char) * (ft_strlen(dst) + ft_strlen(src) + 1));
-	if (!new)
-		return (NULL);
-	while (dst && dst[j])
-		new[i++] = dst[j++];
-	while (src[k])
-		new[i++] = src[k++];
-	new[i] = '\0';
-	return (new);
-}
-// voir si y a un \n
-int newline(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\n')
-		return (1);
-	return (0);
+	return (-1);
 }

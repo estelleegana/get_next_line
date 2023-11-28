@@ -24,14 +24,14 @@
 # include <fcntl.h>
 
 //gnl
-int		newline(char *str);
-char	*ft_linepure(char *stash);
-char	*ft_cleanstash(char	*stash);
+char	*ft_strjoin(char *stash, char *buf);
+char	*ft_cleanstash(char *stash);
+char	*ft_generatestash(char *stash, int fd, char *buf);
+char	*ft_linepure(char *str);
 char	*get_next_line(int fd);
-//gnl_u
-int		ft_strlen(char *str);
-int		i_newline(char *str);
-char	*ft_strdup(char *str);
-char	*ft_strjoin(char *dst, char *src);
+//gnlu
+int		ft_strlen(char *s);
+void	ft_bzero(char *buf);
+int		i_nl(char *line);
 
 #endif

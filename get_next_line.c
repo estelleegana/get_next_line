@@ -12,83 +12,120 @@
 
 #include "get_next_line.h"
 
-// ecrire tout ce qu'il y a avant le \n
-char *ft_linepure(char *stash)
+char	*ft_strjoin(char *dst, char *src)
 {
-	int i;
-	char *new;
+	char	*join;
+	int		i;
 
+	join = malloc(sizeof(char) * (ft_strlen(dst) + ft_strlen(src) + 1));
+	if (!join)
+		return (NULL);
 	i = 0;
-	new = malloc(sizeof(char) * (i_newline(stash) + 1));
-	while (stash[i] && stash[i] != '\n')
+	while (dst && dst[i])
 	{
-		new[i] = stash[i];
+		join[i] = dst[i];
 		i++;
 	}
-	new[i++] = '\n';
-	new[i] = '\0';
+	i = 0;
+	while (src && src[i])
+	{
+		join[i + ft_strlen(dst)] = src[i];
+		i++;
+	}
+	join[i + ft_strlen(dst)] = '\0';
+	free(dst);
+	return (join);
+}
+
+char	*ft_cleanstash(char *stash)
+{
+	int		i;
+	int		j;
+	char	*new;
+
+	i = 0;
+	while (stash[i] && stash[i] != '\n')
+		i++;
+	if (stash[i] && stash[i] == '\n')
+		i++;
+	new = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
+	if (!new)
+		return (free(stash), NULL);
+	j = 0;
+	while (stash[i])
+		new[j++] = stash[i++];
+	new[j] = '\0';
+	free(stash);
 	return (new);
 }
 
-// nettoyer avant le \n et garder ce qu'il y a apres
-char *ft_cleanstash(char *stash)
+char	*ft_generatestash(char *stash, int fd, char *buf)
 {
-	char *cleaned;
-	int i;
-	int j;
+	int	res;
 
-	i = 0;
-	j = 0;
-	cleaned = malloc(sizeof(char) * (ft_strlen(stash) - i_newline(stash) + 1));
-	if (!cleaned)
-		return (NULL);
-	while (stash[i] && stash[i] != '\n')
-		i++;
-	if (stash[i] == '\n')
+	res = 1;
+	while (i_nl(stash) < 0 && res != 0)
 	{
-		i++;
-		while (stash[i])
-			cleaned[j++] = stash[i++];
-	}
-	return (cleaned);
-}
-
-char *get_next_line(int fd)
-{
-	static char *stash = NULL;
-	char *line;
-	char *buf;
-	int readbytes = 0;
-
-	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	readbytes = read(fd, buf, BUFFER_SIZE);
-	if (!buf)
-		return (NULL);
-	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0 || readbytes < 0)
-		return (NULL);
-	//premiere boucle
-	if (stash == NULL)
-		stash = ft_strdup(buf);
-	printf("premiere init %s", buf);
-	//autre + premiere boucle
-	while (buf)
-	{
-		if (newline(stash))
-			break ;
-		else
+		res = read(fd, buf, BUFFER_SIZE);
+		if (res == -1)
+			return (NULL);
+		buf[res] = '\0';
+		if (res > 0)
 		{
 			stash = ft_strjoin(stash, buf);
-			printf("join %s", stash);
+			if (!stash)
+				return (NULL);
+			ft_bzero(buf);
 		}
-
 	}
-	//isoler tt cquil y a avant \n
-	line = ft_linepure(stash);
-	printf("line :::: %s", line);
-	//nettoyer avant \n laisser le reste
-	stash = ft_cleanstash(stash);
-	printf("stash ::::%s", stash);
+	if (res == -1)
+		return (NULL);
+	return (stash);
+}
+
+char	*ft_linepure(char *str)
+{
+	int		i;
+	char	*res;
+
+	i = 0;
+	if (!str || str[0] == '\0')
+		return (NULL);
+	while (str[i] && str[i] != '\n')
+		i++;
+	if (i_nl(str) >= 0)
+		res = malloc(sizeof(char) * (i + 2));
+	else
+		res = malloc(sizeof(char) * (i + 1));
+	if (!res)
+		return (NULL);
+	i = 0;
+	while (str[i] && str[i] != '\n')
+	{
+		res[i] = str[i];
+		i++;
+	}
+	if (str[i] == '\n')
+		res[i++] = '\n';
+	res[i] = '\0';
+	return (res);
+}
+
+char	*get_next_line(int fd)
+{
+	char		*line;
+	static char	*stash;
+	char		*buf;
+
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buf)
+		return (NULL);
+	stash = ft_generatestash(stash, fd, buf);
+	if (!stash)
+		return (free(buf), NULL);
 	free(buf);
+	line = ft_linepure(stash);
+	stash = ft_cleanstash(stash);
 	if (!stash)
 		return (free(line), NULL);
 	if (!line)
