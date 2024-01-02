@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-#include <stdio.h>
+#include "../incl/get_next_line.h"
 
 int main(int ac, char **av)
 {
