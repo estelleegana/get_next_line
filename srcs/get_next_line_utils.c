@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "../incl/get_next_line.h"
 
 int	ft_strlen(char *str)
 {
